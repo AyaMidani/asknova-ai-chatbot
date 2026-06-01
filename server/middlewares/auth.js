@@ -13,6 +13,6 @@ export const protect = async (req, res, next) => {
         req.user = user;
         next();
     } catch (err) {
-        res.status(401).json({ success: false, message: 'Not authorized, token invalid' });
+        res.status(401).json({ success: false, message: 'Not authorized, token' });
     }
 };
