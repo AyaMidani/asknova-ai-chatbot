@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react'
 import { dummyPublishedImages } from '../assets/assets'
-import Loading from './loading'
+import Loading from './Loading'
 
 function Community() {
   const [images, setImages] = useState([])

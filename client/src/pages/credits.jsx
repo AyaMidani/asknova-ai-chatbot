@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react'
 import {dummyPlans} from '../assets/assets'
-import Loading from './loading'
+import Loading from './Loading'
 
 function Credits() {
   const [plans, setPlans] = useState([])
