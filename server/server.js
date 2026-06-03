@@ -3,6 +3,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import connectDB from './configs/db.js';
 import userRouter from './routes/userRoutes.js';
+import chatRouter from './routes/chatRoutes.js';
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
   res.send('Hello from the server!');
 });
 app.use('/api/user', userRouter);
+app.use('/api/chat', chatRouter);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
