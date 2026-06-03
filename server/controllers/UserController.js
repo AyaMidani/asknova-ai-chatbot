@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs'; 
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -20,8 +21,9 @@ export const registerUser = async (req, res) => {
         const token = generateToken(user._id);
         res.status(201).json({ success: true, message: 'User registered successfully', token });
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
+    console.error(err); // add this
+    res.status(500).json({ success: false, message: err.message }); // return real error
+}
 };
 
 // API to login a user
@@ -40,7 +42,7 @@ export const loginUser = async (req, res) => {
         const token = generateToken(user._id);
         res.status(200).json({ success: true, message: 'User logged in successfully', token });
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 
