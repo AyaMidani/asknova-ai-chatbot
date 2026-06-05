@@ -1,4 +1,5 @@
 import Transaction from "../models/Transaction.js"
+import Stripe from "stripe"
 
 const plans =[
     {
@@ -31,12 +32,15 @@ export const getPlans = (req, res) => {
 
     }
     catch (error) {
+        console.error("Error fetching plans:", error)
         res.status(500).json({ success: false, message: error.message })
     }
 }
 
+const stripe= new Stripe(process.env.STRIPE_SECRET_KEY)
+
 //API Controller for purchasing a plan
-export const purchasePlan = (req, res) => {
+export const purchasePlan = async (req, res) => {
     try {
         const { planId } = req.body
         const userId = req.user._id 
@@ -44,15 +48,38 @@ export const purchasePlan = (req, res) => {
         if (!plan) {
             return res.status(404).json({ success: false, message: "Plan not found" })
         }
-        const transaction = Transaction.create({
+        const transaction = await Transaction.create({
             userId: userId,
             planId: plan._id,
             amount: plan.price,
             credits: plan.credits,
             isPaid : false,
         })
+        const {origin} = req.headers
+        const session = await stripe.checkout.sessions.create({
+            line_items: [
+                {
+                price_data: {
+                    currency: 'EUR',
+                    unit_amount: plan.price * 100, // Stripe expects amount in cents
+                    product_data: {
+                    name: plan.name,
+                    },
+                },
+                quantity: 1,
+                },
+            ],
+            mode: 'payment',
+            success_url: `${origin}loading`,
+            cancel_url: `${origin}`,
+            metadata: {
+                transactionId: transaction._id.toString(),
+                appId: "asknova",
+            },
+            expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // Session expires in 30 minutes
+        });
         // Here you would typically integrate with a payment gateway and update the user's credits in the database
-        res.status(200).json({ success: true, message: `You have successfully purchased the ${plan.name} plan!`, creditsAdded: plan.credits })
+        res.status(200).json({ success: true, message: `You have successfully purchased the ${plan.name} plan!`, url: session.url })
     }
     catch (error) {
         res.status(500).json({ success: false, message: error.message })
