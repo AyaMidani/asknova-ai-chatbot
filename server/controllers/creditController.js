@@ -55,7 +55,7 @@ export const purchasePlan = async (req, res) => {
             credits: plan.credits,
             isPaid : false,
         })
-        const {origin} = req.headers
+        const origin = req.headers.origin || process.env.CLIENT_URL || 'http://localhost:5173'
         const session = await stripe.checkout.sessions.create({
             line_items: [
                 {
@@ -70,8 +70,8 @@ export const purchasePlan = async (req, res) => {
                 },
             ],
             mode: 'payment',
-            success_url: `${origin}loading`,
-            cancel_url: `${origin}`,
+            success_url: `${origin}/loading`, 
+            cancel_url: `${origin}/`,
             metadata: {
                 transactionId: transaction._id.toString(),
                 appId: "asknova",
