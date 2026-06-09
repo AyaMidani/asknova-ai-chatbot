@@ -1,7 +1,7 @@
 import { use, useEffect, useState, useRef } from 'react'
 import { useAppContext } from '../context/AppContext';
 import { assets } from '../assets/assets';
-import Message from './message';
+import Message from "./Message";
 import toast from 'react-hot-toast';
 
 function Chatbox() {
