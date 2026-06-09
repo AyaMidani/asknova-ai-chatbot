@@ -1,4 +1,4 @@
-import React, {useState,useEffect} from 'react'
+import {useState,useEffect} from 'react'
 import { dummyPublishedImages } from '../assets/assets'
 import Loading from './Loading'
 import { useAppContext } from '../context/AppContext'

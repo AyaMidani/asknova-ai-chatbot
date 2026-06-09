@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
 
-const loading = () => {
+const Loading = () => {
   const navigate = useNavigate()
   const {fetchUser} = useAppContext();
 
@@ -22,4 +22,4 @@ const loading = () => {
   )
 }
 
-export default loading
+export default Loading
