@@ -32,7 +32,6 @@ export const textMessageController = async (req, res) => {
                     content: prompt,
                 },
             ],
-            max_tokens: 1024,
         });
         const reply ={...choices[0].message,timestamp: Date.now(),isImage: false}
         res.status(200).json({ success: true, reply })
