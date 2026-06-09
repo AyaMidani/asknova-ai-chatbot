@@ -9,16 +9,18 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { assets } from './assets/assets'
 import './assets/prism.css'
 import { useAppContext } from './context/AppContext'
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const {pathname} = useLocation()
-  const {user} = useAppContext()
-  if(pathname === '/loading'){
+  const {user, loading} = useAppContext()
+  if(pathname === '/loading' || loading ){
     return <Loading />
   } 
   return (
     <>
+    <Toaster />
     { !isMenuOpen && <img src={assets.menu_icon} className='absolute top-3 left-3 w-8 h-8 cursor-pointer md:hidden not-dark:invert' onClick={() => setIsMenuOpen(true)} alt='Menu' /> }
     {user ? (
       <div className='dark:bg-gradient-to-b from-[#242124] to-[#000000] dark:text-white'>

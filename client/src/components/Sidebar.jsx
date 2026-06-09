@@ -2,10 +2,37 @@ import React , {useState} from 'react'
 import { useAppContext } from '../context/AppContext';
 import { assets } from '../assets/assets';
 import moment from 'moment';
+import toast from 'react-hot-toast';
 
 function Sidebar({isMenuOpen, setIsMenuOpen}) {
-  const {chats, setSelectedChat, theme, setTheme, user, navigate} = useAppContext();
+  const {chats, setSelectedChat, theme, setTheme, user, navigate, createNewChat, axios, setChats, fetchUsersChat, setToken, token} = useAppContext();
   const [search, setSearch] = useState(''); 
+
+  const logout = () =>{
+    localStorage.removeItem('token')
+    setToken(null)
+    toast.success('Logged out successfully')
+  }
+
+  const deleteChat = async (e,chatId) =>{
+    try {
+      e.stopPropagation()
+      const confirm = window.confirm('Are you sure you want to delete this chat?')
+      if (!confirm) return;
+      const {data} = await axios.delete('/api/chat/delete', {
+          data: { chatId },
+          headers: {Authorization : token}
+        })
+      if (data.success){
+        setChats(prev => prev.filter(chat => chat._id !== chatId))
+        await fetchUsersChat()
+        toast.success(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
   return (
     <div className={`flex flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 border-r border-[#80609F]/30 backdrop-blur-3xl transition-all duration-500 max-md:absolute left-0 z-1 
     ${!isMenuOpen && 'max-md:-translate-x-full'}`}>
@@ -29,7 +56,7 @@ function Sidebar({isMenuOpen, setIsMenuOpen}) {
                 <p className='truncate w-full'>{chat.messages.length > 0 ? chat.messages[0].content.slice(0, 32): chat.name}</p>
                 <p>{moment(chat.updatedAt).fromNow()}</p>
               </div>
-              <img src={assets.bin_icon} className='hidden group-hover:block w-4 cursor-pointer not-dark:invert' alt='Chat' />
+              <img onClick={e => toast.promise(deleteChat(e,chat._id), {loading: 'deleting...'})} src={assets.bin_icon} className='hidden group-hover:block w-4 cursor-pointer not-dark:invert' alt='Chat' />
             </div>
           ))
         }
@@ -82,7 +109,7 @@ function Sidebar({isMenuOpen, setIsMenuOpen}) {
           className='w-7 rounded-full'
           alt='Gallery'/>
           <p className='flex-1 text-sm dark:text-primary truncate'>{user ? user.name : 'Login your account'}</p>
-          { user && <img src={assets.logout_icon} className='h-5 cursor-pointer hidden not-dark:invert group-hover:block' alt='Logout' /> }
+          { user && <img onClick={logout} src={assets.logout_icon} className='h-5 cursor-pointer hidden not-dark:invert group-hover:block' alt='Logout' /> }
       </div>
       <img onClick={()=>setIsMenuOpen(false)} src={assets.close_icon} className='absolute top-3 right-3 w-5 h-5 cursor-pointer md:hidden not-dark:invert' alt='Close' />
     </div>
