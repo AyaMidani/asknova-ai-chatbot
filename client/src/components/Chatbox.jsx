@@ -13,37 +13,33 @@ function Chatbox() {
   const [isPublished, setIsPublished] = useState(false);
   const containerRef = useRef(null);
   
-  const onSubmit = async (e) => {
+const onSubmit = async (e) => {
+    e.preventDefault();
+    const promptCopy = prompt
     try {
-      e.preventDefault();
       if(!user) return toast('Login to send message')
       setLoading(true)
-      const promptCopy = prompt
       setPrompt('')
-      setMessages(prev => [...prev, {role: 'user', content: prompt, timestamp:Date.now(), isImage: false}])
-      const {data} = await axios.post(`/api/message/${mode}`, {chatId: selectedChat._id, prompt, isPublished}, {
+      setMessages(prev => [...prev, {role: 'user', content: promptCopy, timestamp:Date.now(), isImage: false}])
+      const {data} = await axios.post(`/api/message/${mode}`, {chatId: selectedChat._id, prompt: promptCopy, isPublished}, {
         headers:{Authorization : token}
       })
       if(data.success){
-        setMessages(prev => [...prev,data.reply])
-        //decrease credits
+        setMessages(prev => [...prev, data.reply])
         if(mode === 'image'){
           setUser(prev => ({...prev, credits: prev.credits - 2}))
-        }
-        else{
+        } else {
           setUser(prev => ({...prev, credits: prev.credits - 1}))
         }
-      }
-      else{
+      } else {
         toast.error(data.message)
         setPrompt(promptCopy)
       }
     } catch (error) {
-      toast.error(data.message)
-    }
-    finally{
-      setPrompt('')
-      setLoading(false)
+       toast.error(error.response?.data?.message || error.message)
+       setPrompt(promptCopy) // ✅ now accessible
+    } finally {
+      setLoading(false) // ✅ removed setPrompt('') from here
     }
   }
 
@@ -94,7 +90,7 @@ function Chatbox() {
       )}  
 
       { /* Prompt Input Box */ }
-      <form onSubmit={onSubmit} className='bg-primary/20 dark:bg- [#583C79]/30 border border-primary dark: border-[#80609F]/30 rounded-full w-full max-w-2x1 p-3 p1-4 mx-auto flex gap-4 items-center' >
+      <form onSubmit={onSubmit} className='bg-primary/20 dark:bg- [#583C79]/30 border border-primary dark: border-[#80609F]/30 rounded-full w-full max-w-l p-3 p1-4 mx-auto flex gap-4 items-center' >
         <select onChange={(e)=>setMode(e.target.value)} value={mode} className='text-sm pl-3 pr-2 outline-none'>
           <option className='dark:bg-purple-900' value="text">Text</option>
           <option className='dark:bg-purple-900' value="image">Image</option>
