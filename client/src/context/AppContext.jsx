@@ -4,6 +4,7 @@ import { useState } from "react";
 import { dummyUserData, dummyChats } from "../assets/assets";
 import axios from "axios";
 import toast from "react-hot-toast";
+import api from '../api.js'
 
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_URL;
 
@@ -21,7 +22,7 @@ export const AppContextProvider = ({ children }) => {
 
     const fetchUser = async () => {
        try {
-        const { data } = await axios.get('/api/user/data', {headers: { Authorization: token }})
+        const { data } = await api.get('/api/user/data');
         if(data.success) {
             setUser(data.user);
         } else {
@@ -42,7 +43,7 @@ export const AppContextProvider = ({ children }) => {
                 return;
             }
             navigate("/");
-            await axios.get('/api/chat/create', {headers: { Authorization: token }})
+            await api.get('/api/chat/create');
             await fetchUsersChat();
         } catch (error) {
             console.error("Error creating chat:", error);
@@ -52,7 +53,7 @@ export const AppContextProvider = ({ children }) => {
 
     const fetchUsersChat = async () => {
         try {
-            const { data } = await axios.get('/api/chat/get', {headers: { Authorization: token }})
+            const { data } = await api.get('/api/chat/get');
             if(data.success) {
                 setChats(data.chats);
             if(data.chats.length === 0) {
